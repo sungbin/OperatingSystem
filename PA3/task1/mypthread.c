@@ -23,7 +23,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 	int tid = pthread_self();
 	int mid = (int) mutex;
 
-	make_edge(tid,mid);
+	add_edge(tid,mid);
 	if(cyclic(tid,mid)) {
 		char buf[500];
 		sprintf(buf,"DEAD LOCK\n");	
@@ -92,7 +92,7 @@ delete_edge(int start,int end) {
 		head = NULL;
 	} else {
 		if(target_edge->next != NULL) {
-			pre->next = tartget_edge->next;
+			pre->next = target_edge->next;
 		} else {
 			pre->next = NULL;
 		}
