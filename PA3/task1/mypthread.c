@@ -30,7 +30,12 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 	int tid = pthread_self();
 	int mid = (int) mutex;
 
+	fprintf(stderr,"tid: %d, mid: %d\n",tid,mid);
+
 	add_edge(tid,mid);
+	fprintf(stderr,"head: %d\n",head->start);
+	for(pEdge t = head; t != NULL; t = t->next)
+		fprintf(stderr,"s: %d, f%d\n",t->start,t->end);
 
 // 	if(cyclic(tid,mid)) {
 // 		char buf[500];
@@ -122,10 +127,14 @@ add_edge(int tid,int mid) {
 	if(head == NULL) {
 		head = new_edge;
 	} else {
-		pEdge pre;
-		for(pre = head; pre != NULL; pre = pre->next) {  }
+		pEdge pre = head;
+		while(pre->next != NULL) {
+			fprintf(stderr,"start: %d\n",pre->start);
+			pre = pre->next;
+		}
 		pre->next = new_edge;
 	}
+	fprintf(stderr,"init done\n");
 }
 void
 init_edge(pEdge edge,int tid, int mid) {
