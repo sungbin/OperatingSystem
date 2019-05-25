@@ -31,20 +31,20 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 	int mid = (int) mutex;
 
 	make_edge(tid,mid);
-	if(cyclic(tid,mid)) {
-		char buf[500];
-		sprintf(buf,"DEAD LOCK\n");	
-		fputs(buf,stderr);
-		exit(1);
-	}
+// 	if(cyclic(tid,mid)) {
+// 		char buf[500];
+// 		sprintf(buf,"DEAD LOCK\n");	
+// 		fputs(buf,stderr);
+// 		exit(1);
+// 	}
 	lockp(mutex);
-	revere_edge(tid,mid);
-	if(cyclic()) {
-		char buf[500];
-		sprintf(buf,"DEAD LOCK\n");	
-		fputs(buf,stderr);
-		exit(1);
-	}
+// 	revere_edge(tid,mid);
+// 	if(cyclic()) {
+// 		char buf[500];
+// 		sprintf(buf,"DEAD LOCK\n");	
+// 		fputs(buf,stderr);
+// 		exit(1);
+// 	}
 }
 
 int
@@ -55,9 +55,9 @@ pthread_mutex_unlock(pthread_mutex_t *mutex) {
 	void *(*unlockp)(pthread_mutex_t *mutex);
 	unlockp = dlsym(RTLD_NEXT, "pthread_mutex_unlock");
 	
-	delete_edge(mid,tid); // because reversed mutex_lock
+// 	delete_edge(mid,tid); // because reversed mutex_lock
 
-	fputs("my unlock!!\n",stderr);
+// 	fputs("my unlock!!\n",stderr);
 	unlockp(mutex);
 }
 
