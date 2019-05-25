@@ -10,8 +10,10 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 
 	void *(*lockp)(pthread_mutex_t *mutex);
 	lockp = dlsym(RTLD_NEXT, "pthread_mutex_lock");
-	
-	fputs("my lock!\n",stderr);
+
+	char buf[500];
+	sprintf(buf,"my lock! %d\n",mutex);	
+	fputs(buf,stderr);
 
 	lockp(mutex);
 
