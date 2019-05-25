@@ -5,12 +5,11 @@
 #include <execinfo.h>
 #include <pthread.h>
 
-typedef Edge *pEdge;
 typedef struct Edge {   // 연결 리스트의 노드 구조체
-    struct NODE *next;    // 다음 노드의 주소를 저장할 포인터
+        struct Edge *next;    // 다음 노드의 주소를 저장할 포인터
 	int start;
 	int end;
-} Edge;
+} Edge, *pEdge;
 
 pEdge head = NULL;
 
