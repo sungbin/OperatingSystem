@@ -55,6 +55,8 @@ pthread_mutex_unlock(pthread_mutex_t *mutex) {
 }
 
 int cyclic(int start, int end) {
+	fputs("cyclic\n",stderr);
+		
 	pEdge node;
 	find_node(node, start);
 
@@ -68,6 +70,8 @@ int cyclic(int start, int end) {
 }
 
 void find_node(pEdge node,int start) {
+	fputs("find_node\n",stderr);
+
 	pEdge pre;
 	for(pre = head; pre != NULL; pre = pre->next) {
 		if(pre->start == start) {
@@ -79,6 +83,7 @@ void find_node(pEdge node,int start) {
 
 void
 delete_edge(int start,int end) {
+	fputs("delete_edge\n",stderr);
 	pEdge target_edge;
 	pEdge pre = head;
 	while(pre->next != NULL) {
@@ -102,6 +107,8 @@ delete_edge(int start,int end) {
 
 void
 add_edge(int tid,int mid) {
+	fputs("add_edge\n",stderr);
+	
 	pEdge new_edge;
 	init_edge(new_edge,tid,mid);
 	if(head == NULL) {
@@ -114,6 +121,7 @@ add_edge(int tid,int mid) {
 }
 void
 init_edge(pEdge edge,int tid, int mid) {
+	fputs("init_edge\n",stderr);
 	edge = (pEdge)malloc(sizeof(Edge));
 	edge->next = NULL;
 	edge->start = tid;
@@ -121,6 +129,7 @@ init_edge(pEdge edge,int tid, int mid) {
 }
 void
 revere_edge(int start,int end) {
+	fputs("revere_edge\n",stderr);
 	pEdge target_edge;
 	pEdge pre;
 	for(pre = head; pre != NULL; pre = pre->next) {
