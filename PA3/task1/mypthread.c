@@ -55,9 +55,11 @@ pthread_mutex_unlock(pthread_mutex_t *mutex) {
 }
 
 int cyclic(int start, int end) {
-	pEdge node = find_node(start);
+	pEdge node;
+	find_node(node, start);
 
-	pEdge next_node = find_node(end);
+	pEdge next_node;
+	find_node(next_node, end);
 	while(next_node != NULL) {
 		if(node == next_node)
 			return 1;
@@ -65,14 +67,14 @@ int cyclic(int start, int end) {
 	return 0;
 }
 
-pEdge find_node(int start) {
+void find_node(pEdge node,int start) {
 	pEdge pre;
 	for(pre = head; pre != NULL; pre = pre->next) {
 		if(pre->start == start) {
 			break;
 		}
 	}
-	return pre;
+	node = pre;
 }
 
 void
@@ -94,7 +96,7 @@ delete_edge(int start,int end) {
 		} else {
 			pre->next = NULL;
 		}
-		free(tartget_edge);
+		free(target_edge);
 	}
 }
 
