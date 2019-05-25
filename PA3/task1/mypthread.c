@@ -12,6 +12,13 @@ typedef struct Edge {   // 연결 리스트의 노드 구조체
 } Edge, *pEdge;
 
 pEdge head = NULL;
+void revere_edge(int start,int end);
+void init_edge(pEdge edge,int tid, int mid) ;
+void add_edge(int tid,int mid) ;
+void delete_edge(int start,int end);
+void find_node(pEdge node,int start);
+int cyclic(int start, int end);
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 int
 pthread_mutex_lock(pthread_mutex_t *mutex) {
