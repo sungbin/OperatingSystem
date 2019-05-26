@@ -28,7 +28,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 	long mid = (long) mutex;
 
 	char buf[500];
-	sprintf(buf,"\nnew: tid:%ld, mid:%ld\n\n",tid,mid);
+//	sprintf(buf,"\nnew: tid:%ld, mid:%ld\n\n",tid,mid);
 	fputs(buf,stderr);
 	
 	Edge edge;
@@ -36,16 +36,19 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 	edge.end = mid;
 	edges[count] = edge;
 	count++;
-	
+
 	if(cyclic(edge.start,edge.end)) {
 		fputs("DEAD LOCK!\n",stderr);
 		exit(1);
 	}
+/*
+	sprintf(buf,"\nLCOK!\n");
+	fputs(buf,stderr);
+*/	
 
 	lockp(mutex);
 
 	reverse(edge.start,edge.end);
-
 	if(cyclic(edge.start,edge.end)) {
 		fputs("DEAD LOCK!\n",stderr);
 		exit(1);
@@ -67,16 +70,16 @@ pthread_mutex_unlock(pthread_mutex_t *mutex) {
 
 
 int cyclic(long start, long end) {
-
+/* for check
 	for(int i = 0; i<count; i++) {
 		char buf[50];
 		sprintf(buf,"start:%ld, end:%ld\n",edges[i].start,edges[i].end);
 		fputs(buf,stderr);
 	}
-
+*/
 	long in = start;
 	long temp = end;
-	while(temp != -1 || temp != in) {
+	while(temp != -1 && temp != in) {
 		temp = find(temp);
 	}
 	if(temp == in)
