@@ -39,7 +39,9 @@ int pthread_mutex_lock(pthread_mutex_t * mutex) {
 
 //		sprintf(temp, "============\n\n") ;
 //		strcat(buf,temp);
-		fputs(buf,stderr);
+		FILE *f;
+		f=fopen("dmonitor.trace","a");
+		fputs(buf,f);
 	}
     n_malloc -= 1;
 
