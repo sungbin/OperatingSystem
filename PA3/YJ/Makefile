@@ -13,7 +13,7 @@ dinning: ddetector.c dinning.c
 
 dinning_deadlock: ddetector.c dinning_deadlock.c
 	gcc -shared -fPIC -o ddetector.so ddetector.c -ldl
-        gcc -pthread dinning_deadlock.c -o exec.out
+	gcc -pthread dinning_deadlock.c -o exec.out
 
 clean:
 	rm -rf ddetector.so exec.out
