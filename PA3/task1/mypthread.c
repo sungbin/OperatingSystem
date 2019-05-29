@@ -27,9 +27,9 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 	long tid = pthread_self();
 	long mid = (long) mutex;
 
-	char buf[500];
+//	char buf[500];
 //	sprintf(buf,"\nnew: tid:%ld, mid:%ld\n\n",tid,mid);
-	fputs(buf,stderr);
+//	fputs(buf,stderr);
 	
 	Edge edge;
 	edge.start = tid;
