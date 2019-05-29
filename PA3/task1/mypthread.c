@@ -49,7 +49,7 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
 	lockp(mutex);
 
 	reverse(edge.start,edge.end);
-	if(cyclic(edge.start,edge.end)) {
+	if(cyclic(edge.end,edge.start)) {
 		fputs("DEAD LOCK!\n",stderr);
 		exit(1);
 	}
