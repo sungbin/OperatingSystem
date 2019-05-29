@@ -1,19 +1,25 @@
-all: ddetector
+all: dmonitor parser
 
-ddetector: ddetector.c
-	gcc -shared -fPIC -o ddetector.so ddetector.c -ldl
+dmonitor: dmonitor.c
+	gcc -shared -fPIC -o dmonitor.so dmonitor.c -ldl
 
-abba: ddetector.c abba.c
-	gcc -shared -fPIC -o ddetector.so ddetector.c -ldl	
-	gcc -rdynamic -g -pthread abba.c -o exec.out
+parser: parser.c
+	gcc -o parser.out parser.c
 
-dinning: ddetector.c dinning.c
-	gcc -shared -fPIC -o ddetector.so ddetector.c -ldl
-	gcc -rdynamic -g -pthread dinning.c -o exec.out
+abba: dmonitor.c ./test/abba.c parser.c
+	gcc -shared -fPIC -o dmonitor.so dmonitor.c -ldl
+	gcc -rdynamic -g -pthread ./test/abba.c -o exec.out
+	gcc -o parser.out parser.c
 
-dinning_deadlock: ddetector.c dinning_deadlock.c
-	gcc -shared -fPIC -o ddetector.so ddetector.c -ldl
-	gcc -rdynamic -g -pthread dinning_deadlock.c -o exec.out
+dinning: dmonitor.c ./test/dinning.c parser.c
+	gcc -shared -fPIC -o dmonitor.so dmonitor.c -ldl
+	gcc -rdynamic -g -pthread ./test/dinning.c -o exec.out
+	gcc -o parser.out parser.c
+
+dinning_deadlock: dmonitor.c ./test/dinning_deadlock.c parser.c
+	gcc -shared -fPIC -o dmonitor.so dmonitor.c -ldl
+	gcc -rdynamic -g -pthread ./test/dinning_deadlock.c -o exec.out
+	gcc -o parser.out parser.c
 
 clean:
-	rm -rf ddetector.so exec.out
+	rm -rf dmonitor.so *.out *.trace

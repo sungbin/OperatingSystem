@@ -20,9 +20,9 @@ Log logs[1000];
 int log_count = 0;
 Info getInfo(char line[]);
 void parse(char _fname[]);
-int main() {
+int main(int argc, char * argv[]) {
 
-	parse("example.trace");
+	parse(argv[1]);
 
 	int i;
         for(i = 0; i<log_count; i++) {
