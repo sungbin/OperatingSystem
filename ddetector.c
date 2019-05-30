@@ -8,7 +8,7 @@
 typedef struct thread {
 	long id ;
 	int mutex_count ;
-	long mutexs[100] ;
+	long mutexes[100] ;
 } Thread ;
 
 int thread_count = 0 ;
@@ -48,7 +48,7 @@ int pthread_mutex_lock(pthread_mutex_t *mutex) {
         }
 	
 	m_lock(mutex) ;
-	thread->mutexs[thread->mutex_count] = mid ;
+	thread->mutexes[thread->mutex_count] = mid ;
         thread->mutex_count++ ;
 }
 
@@ -93,9 +93,9 @@ long find(long start) {
 
 void mremove(long m, Thread * thread) {
 	for (int i = 0; i < thread->mutex_count; i++) {
-		if (thread->mutexs[i] == m) {
+		if (thread->mutexes[i] == m) {
 			for(int j = i + 1; j < thread->mutex_count; j++)
-                                thread->mutexs[j-1] = thread->mutexs[j] ;
+                                thread->mutexes[j-1] = thread->mutexs[j] ;
                         i-- ;
                         thread->mutex_count-- ;
 		}
@@ -128,7 +128,7 @@ void draw(Thread * thread, long mid) {
 		for(int j = 0; j < e_count; j++) {
 			Edge edge = edges[j] ;
 		
-			long start = thread->mutexs[i] ;
+			long start = thread->mutexes[i] ;
 			long end = mid ;
 			
 			if (edge.start == start && edge.end == end) {
@@ -136,8 +136,8 @@ void draw(Thread * thread, long mid) {
                         	break ;
 			}
         	}
-		if (check || thread->mutexs[i] == mid) continue ;
-		add_edge(thread->mutexs[i], mid) ;
+		if (check || thread->mutexes[i] == mid) continue ;
+		add_edge(thread->mutexes[i], mid) ;
 	}
 }
 
