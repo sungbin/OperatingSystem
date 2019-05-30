@@ -20,7 +20,7 @@ typedef struct edge {
 } Edge ;
 
 int e_count = 0 ;
-Edge edges[55] ;
+Edge edges[5050] ;
 
 int cyclic() ;
 long find(long start) ;
