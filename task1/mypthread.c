@@ -19,7 +19,7 @@ typedef struct _Edge {
 	long  end;
 } Edge;
 
-Edge edges[45];
+Edge edges[55];
 
 int edge_count = 0;
 
