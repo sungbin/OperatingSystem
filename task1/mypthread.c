@@ -49,6 +49,8 @@ pthread_mutex_lock(pthread_mutex_t *mutex) {
                 exit(1);
         }
 	lockp(mutex);
+	thread->mutexs[thread->mutex_count] = mid;
+        thread->mutex_count++;
 }
 
 int
@@ -146,8 +148,6 @@ void draw(Thread* thread,long mid) {
 		if(check || thread->mutexs[i] == mid) continue;
 		add_edge(thread->mutexs[i],mid);
 	}
-	thread->mutexs[thread->mutex_count] = mid;
-	thread->mutex_count++;
 }
 void add_edge(long start, long end) {
 //	fprintf(stderr,"add edge: %ld -> %ld, %\d\n",start,end,pthread_self());
