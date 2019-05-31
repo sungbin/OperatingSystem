@@ -14,18 +14,7 @@ typedef struct thread {
 int thread_count = 0 ;
 Thread threads[10] ;
 
-typedef struct edge {
-	long start ;
-	long end ;
-} Edge ;
-
-int e_count = 0 ;
-Edge edges[55] ;
-
-int cyclic() ;
-long find(long start) ;
 Thread * find_thread(long tid) ;
-int _cyclic(long start, long end) ;
 void draw(Thread* thread,long mid) ;
 void add_edge(long start, long end, Thread * thread) ;
 void mremove(long m,Thread* thread) ;
@@ -60,31 +49,6 @@ int pthread_mutex_unlock(pthread_mutex_t * mutex) {
 	m_unlock(mutex) ;
 }
 
-int cyclic() {
-	int sum = 0 ;
-
-	for (int i = 0; i<e_count; i++)
-		sum += _cyclic(edges[i].start, edges[i].end) ;
-	
-	return sum ;
-}
-
-int _cyclic(long start, long end) {
-	long in = start ;
-	long temp = end ;
-	
-	while (temp != -1 && temp != in)
-		temp = find(temp) ;
-	
-	if (temp == in) return 1 ;
-	else return 0 ;
-}
-
-long find(long start) {
-	for (int i = 0; i<e_count; i++)
-		if(edges[i].start == start) return edges[i].end ;
-	return -1 ;
-}
 
 void mremove(long m, Thread * thread) {
 	for (int i = 0; i < thread->mutex_count; i++) {
@@ -118,7 +82,7 @@ void draw(Thread * thread, long mid) {
 void add_edge(long start, long end, Thread * thread) {
 
 	char buf[500] = "";
-	char g[100] = "G[";
+	char g[100] = "[";
 	
 	int i;
 	for(i = 0; i<thread->mutex_count; i++) {
@@ -132,9 +96,10 @@ void add_edge(long start, long end, Thread * thread) {
 
 	sprintf(buf,"%d,0,%d,%s,0,%d\n",start,thread->id,g,end);
 
-	fputs(buf,stderr);
+	FILE *f;
+	f = fopen("dmonitor.trace","a");
+	fputs(buf,f);
+	fclose(f);
+//	fputs(buf,stderr);
 
-	Edge edge = {start, end} ;
-	edges[e_count] = edge ;
-	e_count++ ;
 }
