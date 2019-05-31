@@ -20,13 +20,52 @@ Log logs[1000];
 int log_count = 0;
 Info getInfo(char line[]);
 void parse(char _fname[]);
+/*
+typedef struct _Edge {
+	int m1;
+	int s1;
+	int t;
+	Mutexs G;
+	int s2;
+	int m2;
+} Edge;
+Edge edges[9900];
+int edge_count = 0;
+*/
+
+typedef struct _Thread {
+	long id;
+	int mutex_count; //holding mutex count
+	long mutexs[100];
+} Thread;
+Thread threads[10];
+int thread_count = 0;
+
+typedef struct _Mutexs {
+	int mutexs[100];
+	int count;
+} Mutexs;
+
 int main(int argc, char * argv[]) {
 
 	parse(argv[1]);
 
+/*
+	int i;
+        for(i = 0; i<log_count; i++) { 
+		int tid = logs[i].thread;
+		int mid = logs[i].mutex;
+*/		
+		
+
+
+
+
 	int i;
         for(i = 0; i<log_count; i++) {
-                printf("mutex: %d, thread: %d\n",logs[i].mutex,logs[i].thread);
+		if(logs[i].info_count == -1)
+			printf("UnLock: mutex: %d\n",logs[i].mutex);
+                else printf("mutex: %d, thread: %d\n",logs[i].mutex,logs[i].thread);
                 int j;
                 for(j = 0; j<logs[i].info_count; j++) {
                         printf("fname: %s, func: %s, addr: %s\n",logs[i].info[j].fname,logs[i].info[j].func,logs[i].info[j].addr);
@@ -50,6 +89,30 @@ void parse(char _fname[]) {
 
                 switch(str[0]) {
 
+			case 'u' : {
+
+                                if(log.mutex != 0) {
+                                        logs[log_count] = log;
+                                        log_count++;
+                                        Log new_log = {1,0,0x0,-1};
+                                        log = new_log;
+                                }
+
+                                char* p;
+                                p = str + 7;
+                                int mutex = atoi(p);
+                                log.mutex = mutex;
+
+				if(log.mutex != 0) {
+                                        logs[log_count] = log;
+                                        log_count++;
+                                        Log new_log = {0,0,0x0,0};
+                                        log = new_log;
+                                }
+
+                                break;
+                        }
+		
                         case 'm' : {
 
                                 if(log.mutex != 0) {
@@ -134,4 +197,3 @@ Info getInfo(char line[]) {
 
 	return info;
 }
-

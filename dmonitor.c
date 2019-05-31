@@ -41,7 +41,9 @@ int pthread_mutex_lock(pthread_mutex_t * mutex) {
 //		strcat(buf,temp);
 		FILE *f;
 		f=fopen("dmonitor.trace","a");
-		fputs(buf,f);
+		//fputs(buf,f);
+		fputs(buf,stderr);
+		fclose(f);
 	}
     n_malloc -= 1;
 
@@ -49,4 +51,25 @@ int pthread_mutex_lock(pthread_mutex_t * mutex) {
 	m_lock = dlsym(RTLD_NEXT, "pthread_mutex_lock") ;
     m_lock(mutex) ;
 }
+int
+pthread_mutex_unlock(pthread_mutex_t *mutex) {
 
+	void *(*unlockp)(pthread_mutex_t *mutex);
+	unlockp = dlsym(RTLD_NEXT, "pthread_mutex_unlock");
+
+//	static __thread int n_malloc = 0 ;
+//        n_malloc += 1 ;
+
+//        if (n_malloc == 1) {
+		int mid = (int) mutex;
+		FILE *f;
+		char buf[50];
+		sprintf(buf,"unlock:%d\n",mid);
+		fputs(buf,stderr);
+		//f=fopen("dmonitor.trace","a");
+        	//fputs(buf,f);
+		//fclose(f);
+//	}
+//	n_malloc -= 1;
+	unlockp(mutex);
+}
