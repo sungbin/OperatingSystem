@@ -1,9 +1,9 @@
 ddetector: ddetector.c
 	gcc -shared -fPIC -o ddetector.so ddetector.c -ldl
 
-dmonitor: dmonitor.c
+dmonitor: dmonitor.c dpredictor.c
 	gcc -shared -fPIC -o dmonitor.so dmonitor.c -ldl
-	gcc -o parser.out parser.c
+	gcc -o dpredictor.out dpredictor.c
 
 abba: ./test/abba.c
 	gcc -pthread ./test/abba.c -o abba.out
