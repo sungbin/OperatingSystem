@@ -82,7 +82,7 @@ void draw(Thread * thread, long mid) {
 void add_edge(long start, long end, Thread * thread) {
 
 	char buf[500] = "";
-	char g[100] = "[";
+	char g[100] = "/";
 	
 	int i;
 	for(i = 0; i<thread->mutex_count; i++) {
@@ -92,7 +92,7 @@ void add_edge(long start, long end, Thread * thread) {
 		strcat(g,temp);
 	}
 	g[strlen(g)-1] = '\0'; // remove: ,
-	strcat(g,"]");
+	strcat(g,"/");
 
 	sprintf(buf,"%d,0,%d,%s,0,%d\n",start,thread->id,g,end);
 
