@@ -114,3 +114,24 @@ void print_sm_containers()
 	printf("=======================================================\n") ;
 
 }
+void print_sm_uses() {
+
+        sm_container_ptr itr ;
+        size_t m1=0, m2=0, m3=0; // retained, alloced retained, not alloced retained
+
+        printf("==================== sm_uses ====================\n") ;
+        for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
+                 //printf("%3d:%p:%s:", i, itr->data, itr->status == Unused ? "Unused" : "  Busy") ;
+                int data = itr->dsize;
+                m1 += data;
+                if(itr->status == Unused)
+                        m3 += data;
+                else
+                        m2 += data;
+        }
+        printf("All retained memnory size: %d\n",m1);
+        printf("retained momery allocated size: %d\n",m2);
+        printf("retained momery not allocated size: %d\n",m3);
+        printf("=======================================================\n") ;   
+
+}
