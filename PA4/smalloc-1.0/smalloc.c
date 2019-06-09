@@ -53,11 +53,15 @@ void * smalloc(size_t size)
 			return itr->data ;
 		}
 		else if (size + sizeof(sm_container_t) < itr->dsize) {
-			// a hole large enought to split 
-			hole = itr ;
-			break ; 
+
+			if(hole == 0x0)
+				hole = itr ;
+			else if(hole->dsize > itr->dsize)
+				hole = itr ;
+
 		}
 	}
+
 	if (hole == 0x0) {
 		hole = sm_retain_more_memory(size) ;
 
