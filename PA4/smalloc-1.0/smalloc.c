@@ -43,7 +43,7 @@ void * smalloc(size_t size)
 	sm_container_ptr hole = 0x0 ;
 
 	sm_container_ptr itr = 0x0 ;
-	for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
+	for (itr = sm_unused_containers ; itr != 0x0 ; itr = itr->next_unused) {
 		if (itr->status == Busy)
 			continue ;
 
@@ -69,14 +69,21 @@ void * smalloc(size_t size)
 			return 0x0 ;
 
 		if (sm_first == 0x0) {
+			sm_unused_containers = hole;
 			sm_first = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
+			hole->next_unused = 0x0;
 		}
 		else {
+			for (itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {
+			}
+			
+			itr->next_unused = hole;
 			sm_last->next = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
+			hole->next_unused = 0x0;
 		}
 	}
 	sm_container_split(hole, size) ;
@@ -86,15 +93,33 @@ void * smalloc(size_t size)
 }
 
 
-
 void sfree(void * p)
 {
-	sm_container_ptr itr ;
+	sm_container_ptr itr, pre,cur,pos;
 	for (itr = sm_first ; itr->next != 0x0 ; itr = itr->next) {
 		if (itr->data == p) {
 			itr->status = Unused ;
+			cur = itr;
 			break ;
 		}
+	}
+
+	for (itr = sm_first ; itr->next != 0x0 ; itr = itr->next) {
+		if(itr->next == cur)
+			pre = itr;
+	}
+	pos = cur->next;
+
+	if(pre->status == Unused) {
+		
+		pre->dsize += cur->dsize;
+		pre->next = cur->next;
+		cur = pre;
+	}
+
+	if(pos != 0x0 && pos->status == Unused) {
+		cur->dsize += pos->dsize;
+		cur->next = pos->next;
 	}
 }
 
