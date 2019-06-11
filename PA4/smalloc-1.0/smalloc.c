@@ -103,20 +103,21 @@ void sfree(void * p)
 			break ;
 		}
 	}
-
-	for (itr = sm_first ; itr->next != 0x0 ; itr = itr->next) {
-		if(itr->next == cur)
-			pre = itr;
+	
+	if(cur != sm_first) {
+		for (itr = sm_first ; itr->next != 0x0 ; itr = itr->next) {
+			if(itr->next == cur) {
+				pre = itr;
+			}
+		}
+		if(pre->status == Unused) {
+                	pre->dsize += cur->dsize;
+                	pre->next = cur->next;
+                	cur = pre;
+        	}
 	}
+
 	pos = cur->next;
-
-	if(pre->status == Unused) {
-		
-		pre->dsize += cur->dsize;
-		pre->next = cur->next;
-		cur = pre;
-	}
-
 	if(pos != 0x0 && pos->status == Unused) {
 		cur->dsize += pos->dsize;
 		cur->next = pos->next;
