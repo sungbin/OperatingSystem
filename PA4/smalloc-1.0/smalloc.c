@@ -6,6 +6,7 @@ sm_container_ptr sm_first = 0x0 ;
 sm_container_ptr sm_last = 0x0 ;
 sm_container_ptr sm_unused_containers = 0x0 ;
 
+void update_sm_unused_containers();
 void sm_container_split(sm_container_ptr hole, size_t size)
 {
 	sm_container_ptr remainder = hole->data + size ;
@@ -58,8 +59,6 @@ void * smalloc(size_t size)
 				hole = itr ;
 			else if(hole->dsize > itr->dsize)
 				hole = itr ;
-			
-			fprintf(stderr,"traverse : %d!!\n",itr->dsize);
 		}
 	}
 
@@ -70,16 +69,12 @@ void * smalloc(size_t size)
 			return 0x0 ;
 
 		if (sm_first == 0x0) {
-			// sm_unused_containers = hole;
 			sm_first = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
 			hole->next_unused = 0x0;
 		}
 		else {
-			//for (itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {   }
-			//itr->next_unused = hole;
-
 			sm_last->next = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
@@ -92,33 +87,28 @@ void * smalloc(size_t size)
 
 	sm_container_ptr remain = hole->next;
 	if(sm_unused_containers == 0x0) sm_unused_containers = remain;
-	else {
-		if(hole == sm_unused_containers) {
-			remain->next_unused = hole->next_unused;
-			sm_unused_containers = remain;
-			fprintf(stderr,"HOW ARE YOU!!\n");
-		} else {
-			for(itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {
-				if(itr->next_unused == hole)	 {
-					break;
-				}
-			}
-			if(itr->next_unused == 0x0) {
-				itr->next_unused = remain; 
-				fprintf(stderr,"Wow!!\n");
-			} else {
-				fprintf(stderr,"THIS!\n");
-				remain->next_unused = hole->next_unused;
-				itr->next_unused = remain;
-
-			}
-		}
-	}
+	else update_sm_unused_containers();
 
 
 	return hole->data ;
 }
 
+void update_sm_unused_containers() {
+	sm_container_ptr new_unused = 0x0, itr2,itr;
+                for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
+                        if(itr->status == Unused) {
+                                if(new_unused == 0x0)  {
+                                        new_unused = itr;
+                                        itr2 = new_unused;
+                                } else {
+                                        itr2->next_unused = itr;
+                                        itr2 = itr2->next_unused;
+                                }
+
+                        }
+                }
+       sm_unused_containers = new_unused;
+}
 
 void sfree(void * p)
 {
@@ -154,6 +144,9 @@ void sfree(void * p)
 		cur->dsize += pos->dsize;
 		cur->next = pos->next;
 	}
+
+	update_sm_unused_containers();
+
 }
 
 void print_sm_containers()
