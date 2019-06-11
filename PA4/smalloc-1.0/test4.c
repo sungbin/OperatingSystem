@@ -16,8 +16,8 @@ main()
 	printf("smalloc(2500)\n") ; 
 	print_sm_containers() ;
 
-	p3 = smalloc(1500) ; 
-	printf("smalloc(1500)\n") ; 
+	p3 = smalloc(1900) ; 
+	printf("smalloc(1900)\n") ; 
 	print_sm_containers() ;
 
 	sfree(p1) ; 
