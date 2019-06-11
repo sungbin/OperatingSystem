@@ -6,6 +6,9 @@ sm_container_ptr sm_first = 0x0 ;
 sm_container_ptr sm_last = 0x0 ;
 sm_container_ptr sm_unused_containers = 0x0 ;
 
+void merge_adjancent_unused_containers_left(sm_container_ptr cur);
+void merge_adjancent_unused_containers_right(sm_container_ptr cur);
+
 void sm_container_split(sm_container_ptr hole, size_t size)
 {
 	sm_container_ptr remainder = hole->data + size ;
@@ -14,6 +17,7 @@ void sm_container_split(sm_container_ptr hole, size_t size)
 	remainder->dsize = hole->dsize - size - sizeof(sm_container_t) ;
 	remainder->status = Unused ;
 	remainder->next = hole->next ;
+	remainder->next_unused = 0x0;
 	hole->next = remainder ;
 
 	if (hole == sm_last)
@@ -44,8 +48,8 @@ void * smalloc(size_t size)
 
 	sm_container_ptr itr = 0x0 ;
 	for (itr = sm_unused_containers ; itr != 0x0 ; itr = itr->next_unused) {
-		if (itr->status == Busy)
-			continue ;
+		// if (itr->status == Busy)
+		//	continue ;
 
 		if (size == itr->dsize) {
 			// a hole of the exact size
@@ -69,29 +73,78 @@ void * smalloc(size_t size)
 			return 0x0 ;
 
 		if (sm_first == 0x0) {
-			sm_unused_containers = hole;
 			sm_first = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
-			hole->next_unused = 0x0;
 		}
 		else {
-			for (itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {
-			}
-			
-			itr->next_unused = hole;
 			sm_last->next = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
-			hole->next_unused = 0x0;
 		}
 	}
 	sm_container_split(hole, size) ;
+	
 	hole->dsize = size ;
 	hole->status = Busy ;
+
+	sm_container_ptr remain = hole->next;
+	if(sm_unused_containers == 0x0) {
+		sm_unused_containers = remain;
+	} else {
+		for (itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {
+			if(hole == itr->next_unused) break;
+		}
+		if( itr->next_unused == 0x0  ) {
+			itr->next_unused = remain;
+			fprintf(stderr,"ERER!!\n");
+		}
+		else {
+
+			fprintf(stderr,"WOW!!\n");
+		}
+	}
+
 	return hole->data ;
 }
 
+void merge_adjancent_unused_containers_left(sm_container_ptr cur) {
+	sm_container_ptr itr, pre;
+
+	if(cur != sm_first && cur->status == Unused) {
+		for (itr = sm_first ; itr->next != 0x0 ; itr = itr->next) {
+                        if(itr->next == cur) {
+                                pre = itr;
+				break;
+                        }
+                }
+                if(pre->status == Unused) {
+			fprintf(stderr,"left: %d\n",cur->dsize);
+			fprintf(stderr,"next: %d\n",cur->next_unused);
+                        pre->dsize += cur->dsize;
+                        pre->next = cur->next;
+			pre->next_unused = cur->next_unused;
+                        cur = pre;
+			fprintf(stderr,"next: %d\n",cur->next_unused);
+			merge_adjancent_unused_containers_left(pre);
+                }
+        }
+}
+void merge_adjancent_unused_containers_right(sm_container_ptr cur) {
+
+        sm_container_ptr itr,pos;
+
+        pos = cur->next;
+        if(pos != 0x0 && pos->status == Unused) {
+		fprintf(stderr,"right: %d\n",cur->dsize);
+                cur->dsize += pos->dsize;
+                cur->next = pos->next;
+		cur->next_unused = pos->next_unused;
+		fprintf(stderr,"next: %d\n",cur->next_unused);
+		merge_adjancent_unused_containers_right(cur);
+        }
+
+}
 
 void sfree(void * p)
 {
@@ -109,24 +162,9 @@ void sfree(void * p)
 		exit(1);
 	}
 	
-	if(cur != sm_first) {
-		for (itr = sm_first ; itr->next != 0x0 ; itr = itr->next) {
-			if(itr->next == cur) {
-				pre = itr;
-			}
-		}
-		if(pre->status == Unused) {
-                	pre->dsize += cur->dsize;
-                	pre->next = cur->next;
-                	cur = pre;
-        	}
-	}
-
-	pos = cur->next;
-	if(pos != 0x0 && pos->status == Unused) {
-		cur->dsize += pos->dsize;
-		cur->next = pos->next;
-	}
+	
+	//merge_adjancent_unused_containers_left(cur);
+	//merge_adjancent_unused_containers_right(cur);
 }
 
 void print_sm_containers()
@@ -135,7 +173,8 @@ void print_sm_containers()
 	int i = 0 ;
 
 	printf("==================== sm_containers ====================\n") ;
-	for (itr = sm_first ; itr != 0x0 ; itr = itr->next, i++) {
+	//for (itr = sm_first ; itr != 0x0 ; itr = itr->next, i++) {
+	for(itr = sm_unused_containers ; itr != 0x0; itr = itr->next_unused) {
 		char * s ;
 		printf("%3d:%p:%s:", i, itr->data, itr->status == Unused ? "Unused" : "  Busy") ;
 		printf("%8d:", (int) itr->dsize) ;
@@ -155,7 +194,8 @@ void print_sm_uses() {
         size_t m1=0, m2=0, m3=0; // retained, alloced retained, not alloced retained
 
         printf("==================== sm_uses ====================\n") ;
-        for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
+        //for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
+	for(itr = sm_unused_containers ; itr != 0x0; itr = itr->next_unused) {
                  //printf("%3d:%p:%s:", i, itr->data, itr->status == Unused ? "Unused" : "  Busy") ;
                 int data = itr->dsize;
                 m1 += data;
