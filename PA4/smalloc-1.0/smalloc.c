@@ -58,7 +58,8 @@ void * smalloc(size_t size)
 				hole = itr ;
 			else if(hole->dsize > itr->dsize)
 				hole = itr ;
-
+			
+			fprintf(stderr,"traverse : %d!!\n",itr->dsize);
 		}
 	}
 
@@ -69,17 +70,16 @@ void * smalloc(size_t size)
 			return 0x0 ;
 
 		if (sm_first == 0x0) {
-			sm_unused_containers = hole;
+			// sm_unused_containers = hole;
 			sm_first = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
 			hole->next_unused = 0x0;
 		}
 		else {
-			for (itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {
-			}
-			
-			itr->next_unused = hole;
+			//for (itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {   }
+			//itr->next_unused = hole;
+
 			sm_last->next = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
@@ -89,6 +89,33 @@ void * smalloc(size_t size)
 	sm_container_split(hole, size) ;
 	hole->dsize = size ;
 	hole->status = Busy ;
+
+	sm_container_ptr remain = hole->next;
+	if(sm_unused_containers == 0x0) sm_unused_containers = remain;
+	else {
+		if(hole == sm_unused_containers) {
+			remain->next_unused = hole->next_unused;
+			sm_unused_containers = remain;
+			fprintf(stderr,"HOW ARE YOU!!\n");
+		} else {
+			for(itr = sm_unused_containers ; itr->next_unused != 0x0 ; itr = itr->next_unused) {
+				if(itr->next_unused == hole)	 {
+					break;
+				}
+			}
+			if(itr->next_unused == 0x0) {
+				itr->next_unused = remain; 
+				fprintf(stderr,"Wow!!\n");
+			} else {
+				fprintf(stderr,"THIS!\n");
+				remain->next_unused = hole->next_unused;
+				itr->next_unused = remain;
+
+			}
+		}
+	}
+
+
 	return hole->data ;
 }
 
@@ -136,6 +163,7 @@ void print_sm_containers()
 
 	printf("==================== sm_containers ====================\n") ;
 	for (itr = sm_first ; itr != 0x0 ; itr = itr->next, i++) {
+	//for (itr = sm_unused_containers ; itr != 0x0 ; itr = itr->next_unused, i++) {
 		char * s ;
 		printf("%3d:%p:%s:", i, itr->data, itr->status == Unused ? "Unused" : "  Busy") ;
 		printf("%8d:", (int) itr->dsize) ;
