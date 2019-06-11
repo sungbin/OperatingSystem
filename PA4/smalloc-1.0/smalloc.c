@@ -95,13 +95,18 @@ void * smalloc(size_t size)
 
 void sfree(void * p)
 {
-	sm_container_ptr itr, pre,cur,pos;
-	for (itr = sm_first ; itr->next != 0x0 ; itr = itr->next) {
+	sm_container_ptr itr, pre,cur = 0x0,pos;
+	for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
 		if (itr->data == p) {
 			itr->status = Unused ;
 			cur = itr;
 			break ;
 		}
+	}
+
+	if(cur == 0x0) {
+		fprintf(stderr,"free(): long address!\n");
+		exit(1);
 	}
 	
 	if(cur != sm_first) {
