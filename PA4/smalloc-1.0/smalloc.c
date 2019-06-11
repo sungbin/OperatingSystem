@@ -15,7 +15,6 @@ void sm_container_split(sm_container_ptr hole, size_t size)
 	remainder->dsize = hole->dsize - size - sizeof(sm_container_t) ;
 	remainder->status = Unused ;
 	remainder->next = hole->next ;
-	remainder->next_unused = 0x0;
 	hole->next = remainder ;
 
 	if (hole == sm_last)
@@ -46,8 +45,8 @@ void * smalloc(size_t size)
 
 	sm_container_ptr itr = 0x0 ;
 	for (itr = sm_unused_containers ; itr != 0x0 ; itr = itr->next_unused) {
-		// if (itr->status == Busy)
-		//	continue ;
+		if (itr->status == Busy)
+			continue ;
 
 		if (size == itr->dsize) {
 			// a hole of the exact size
@@ -73,22 +72,23 @@ void * smalloc(size_t size)
 			sm_first = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
+			hole->next_unused = 0x0;
 		}
 		else {
 			sm_last->next = hole ;
 			sm_last = hole ;
 			hole->next = 0x0 ;
+			hole->next_unused = 0x0;
 		}
 	}
 	sm_container_split(hole, size) ;
-	
 	hole->dsize = size ;
 	hole->status = Busy ;
 
 	sm_container_ptr remain = hole->next;
-
 	if(sm_unused_containers == 0x0) sm_unused_containers = remain;
 	else update_sm_unused_containers();
+
 
 	return hole->data ;
 }
@@ -176,8 +176,7 @@ void print_sm_uses() {
         size_t m1=0, m2=0, m3=0; // retained, alloced retained, not alloced retained
 
         printf("==================== sm_uses ====================\n") ;
-        //for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
-	for(itr = sm_unused_containers ; itr != 0x0; itr = itr->next_unused) {
+        for (itr = sm_first ; itr != 0x0 ; itr = itr->next) {
                  //printf("%3d:%p:%s:", i, itr->data, itr->status == Unused ? "Unused" : "  Busy") ;
                 int data = itr->dsize;
                 m1 += data;
